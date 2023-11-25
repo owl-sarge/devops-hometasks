@@ -20,10 +20,10 @@ Vagrant.configure("2") do |config|
         apt-get install -y apache2
         apt-get install -y php
         mkdir -p /var/www/html/
-        cp -rf /tmp_files/vagrant/index.html /var/www/html/index.html
+        cp -rf /vagrant/index.html /var/www/html/index.html
         mkdir -p /var/www/php/
-        cp -rf /tmp_files/vagrant/index.php /var/www/php/index.php
-        cp -rf /tmp_files/vagrant/all_vhost.conf /etc/apache2/sites-available/all_vhost.conf
+        cp -rf /vagrant/index.php /var/www/php/index.php
+        cp -rf /vagrant/all_vhost.conf /etc/apache2/sites-available/all_vhost.conf
         sudo a2ensite all_vhost.conf
         systemctl reload apache2.service
     SHELL
