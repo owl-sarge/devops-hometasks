@@ -1,0 +1,76 @@
+---
+- hosts: 
+   - 2host
+  tasks:
+  - name: install Apache
+    become: true 
+    apt:
+      name: apache2
+      state: present
+
+  - name: install php
+    become: true
+    apt:
+      name: php
+      state: present
+
+  - name: create directory for php-vhost
+    become: true
+    file:
+      path: /var/www/php/
+      state: directory
+      owner: root
+      mode: 0755
+
+  - name: copy file index.html with owner and permissions
+    become: true
+    copy:   
+      src: /vagrant/files/index.html
+      dest: /var/www/html/index.html
+      owner: root
+      group: root
+      mode: 0755
+      remote_src: true
+
+  - name: copy file index.php with owner and permissions
+    become: true    
+    copy:   
+      src: /vagrant/files/index.php
+      dest: /var/www/php/index.php
+      owner: root
+      group: root
+      mode: 0644
+      remote_src: true
+
+  - name: copy vhost.conf with owner and permissions
+    become: true    
+    copy:   
+      src: /vagrant/files/vhost.conf
+      dest: /etc/apache2/sites-available/vhost.conf
+      owner: root
+      group: root
+      mode: 0644
+      remote_src: true
+  - name: add Apache port is 8080
+    become: true
+    lineinfile:
+      dest: /etc/apache2/ports.conf
+      insertafter: '^Listen 80'
+      line: Listen 8080
+      state: present
+  - name: add Apache port is 8081
+    become: true
+    lineinfile:
+      dest: /etc/apache2/ports.conf
+      insertafter: '^Listen 8080'
+      line: Listen 8081
+      state: present
+  - name: a2ensite enabled
+    become: true
+    command: /usr/sbin/a2ensite vhost.conf
+
+  - name: restart apache2
+    become: true
+    service:
+        name: apache2
+        state: reloaded
