@@ -2,12 +2,16 @@
 - hosts: 
    - r-proxy
   tasks:
-  - name: install nginx, php
+  - name: install nginx
     become: true 
     apt:
-      name: 
-      - nginx
-      - php
+      name: nginx
+      state: present
+
+  - name: install php
+    become: true 
+    apt:
+      name: php
       state: present
 
   - name: copy file index.html with owner and permissions
@@ -28,6 +32,12 @@
       group: root
       mode: 0777
       state: link 
+
+  - name: disable default config
+    become: true
+    file:
+      dest: /etc/nginx/sites-enabled/default
+      state:  absent    
 
   - name: restart nginx
     become: true
