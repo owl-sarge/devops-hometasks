@@ -1,0 +1,36 @@
+---
+- hosts: 
+   - r-proxy
+  tasks:
+  - name: install nginx, php
+    become: true 
+    apt:
+      name: 
+      - nginx
+      - php
+      state: present
+
+  - name: copy file index.html with owner and permissions
+    become: true
+    copy:   
+      src: /vagrant/files/proxy.conf
+      dest: /etc/nginx/sites-available/proxy.conf
+      owner: root
+      group: root
+      mode: 0755
+      remote_src: true
+  - name: Create a symbolic link
+    become: true
+    file:
+      src: /etc/nginx/sites-available/proxy.conf
+      dest: /etc/nginx/sites-enabled/proxy.conf
+      owner: root
+      group: root
+      mode: 0777
+      state: link 
+
+  - name: restart nginx
+    become: true
+    service:
+        name: nginx
+        state: reloaded 

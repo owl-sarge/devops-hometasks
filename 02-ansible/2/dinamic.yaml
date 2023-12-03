@@ -1,0 +1,55 @@
+---
+- hosts: dinamic
+  vars:
+    vhost_p: "8000"
+    dir_vhost: "/var/www/php"
+  tasks:
+  - name: install Apache, php
+    become: true 
+    apt:
+      name: 
+      - apache2
+      - php
+      state: present
+ 
+  - name: create directory for php-vhost
+    become: true
+    file:
+      path: /var/www/php/
+      state: directory
+      owner: root
+      mode: 0755
+
+  - name: copy file index.php with owner and permissions
+    become: true
+    copy:
+      src: /vagrant/files/index.php
+      dest: /var/www/php/index.php
+      owner: root
+      group: root
+      mode: 0644
+      remote_src: true
+
+  - name: change Apache port is 8000
+    become: true
+    lineinfile:
+      dest: /etc/apache2/ports.conf
+      regexp: '^Listen 80' 
+      line: Listen 8000
+      state: present
+
+  - name: vhost configure
+    become: true
+    template:
+        src: vhost_conf.j2
+        dest: /etc/apache2/sites-available/vhost.conf
+
+  - name: a2ensite enabled
+    become: true
+    command: /usr/sbin/a2ensite vhost.conf
+
+  - name: restart apache2
+    become: true
+    service:
+        name: apache2
+        state: reloaded

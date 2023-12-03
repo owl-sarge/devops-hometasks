@@ -1,0 +1,54 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+ 
+  config.vm.box = "generic/debian10"
+    
+  config.vm.define "html" do |html|
+    html.vm.provider "virtualbox" do |vb|
+      vb.name = "static-host"
+      vb.gui = false
+      vb.memory = "512"
+      end
+    html.vm.network "private_network", ip: "192.168.56.12"
+    html.vm.synced_folder ".", "/vagrant"
+    html.vm.provision "ansible" do |ansible|
+    ansible.playbook = "static.yaml"
+    ansible.limit = 'all'
+    ansible.inventory_path = "inventory"
+
+    end   
+  end
+  config.vm.define "php" do |php|
+    php.vm.provider "virtualbox" do |vb|
+      vb.name = "dinamic-host"
+      vb.gui = false
+      vb.memory = "512"
+      end
+    php.vm.network "private_network", ip: "192.168.56.13"
+    php.vm.synced_folder ".", "/vagrant"
+    php.vm.provision "ansible" do |ansible|
+      ansible.playbook = "dinamic.yaml"
+      ansible.limit = 'all'
+      ansible.inventory_path = "inventory"
+    end
+  end
+
+  config.vm.define "rproxy" do |rproxy|
+    rproxy.vm.provider "virtualbox" do |vb|
+      vb.name = "nginx-host"
+      vb.gui = false
+      vb.memory = "512"
+      end
+    rproxy.vm.network "private_network", ip: "192.168.56.11"
+    rproxy.vm.synced_folder ".", "/vagrant"
+    rproxy.vm.provision "ansible" do |ansible|
+      ansible.playbook = "nginx.yaml"
+      ansible.limit = 'all'
+      ansible.inventory_path = "inventory"
+
+    end
+  end
+
+end
