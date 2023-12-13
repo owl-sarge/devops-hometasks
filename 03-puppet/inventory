@@ -1,0 +1,17 @@
+master.puppet ansible_connection=local
+
+slave1.puppet ansible_host=192.168.56.21
+slave2.puppet ansible_host=192.168.56.22
+
+mineserver.puppet ansible_host=192.168.56.23 
+
+[slaves]
+slave1.puppet 
+slave2.puppet 
+mineserver.puppet
+
+[all:vars]
+ansible_connection=ssh
+ansible_user=vagrant
+ansible_password=vagrant
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

@@ -1,0 +1,186 @@
+---
+# install Puppet platform repository
+- hosts: all
+  roles:
+    - role: add-repo
+      become: true
+
+# puppetserver setting
+- hosts: master.puppet
+  tasks:
+  - name: Install sshpass, puppetserver, git
+    become: true
+    dnf:
+      name: 
+       - sshpass
+       - puppetserver
+       - git
+      state: present
+
+  - name: Insert PATH
+    become: true
+    lineinfile:
+      dest: ~/.bashrc
+      line: export PATH=$PATH:/opt/puppetlabs/bin:/opt/puppetlabs/puppet/bin
+      state: present
+
+  - name: Resize RAM
+    become: true
+    lineinfile:
+      dest: /etc/sysconfig/puppetserver
+      regexp: '^JAVA_ARGS="-Xms2g -Xmx2g -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"$'
+      line: JAVA_ARGS="-Xms256m -Xmx256m -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"
+      state: present
+
+  - name: Stoped firewall
+    become: true
+    systemd_service:
+      name: firewalld.service
+      state: stopped
+
+  - name: Stoped puppetserver
+    become: true
+    systemd_service:
+      name: puppetserver.service
+      state: stopped    
+
+  - name: add puppetserver config
+    become: true
+    copy:
+      src: /vagrant/files/puppetserver.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf
+      owner: root
+      group: root
+      mode: '0644'
+      remote_src: true
+
+  - name: copy config autosign
+    become: true
+    copy:
+      src: /vagrant/files/autosign.conf
+      dest: /etc/puppetlabs/puppet/autosign.conf
+      owner: puppet
+      group: puppet
+      mode: '0644'
+      remote_src: true
+
+  - name: Create directory r10k
+    become: true
+    file:
+      path: /etc/puppetlabs/r10k
+      state: directory
+      mode: '0644'
+
+  - name: copy config r10k
+    become: true
+    copy:
+      src: /vagrant/files/r10k.yaml
+      dest: /etc/puppetlabs/r10k/r10k.yaml
+      owner: puppet
+      group: puppet
+      mode: '0644'
+      remote_src: true
+
+  - name: Install r10k
+    become: true
+    command: /opt/puppetlabs/puppet/bin/gem install r10k
+
+  - name: Started puppetserver
+    become: true
+    systemd_service:
+      name: puppetserver.service
+      state: started
+      enabled: true
+
+  - name: Deploy r10k
+    become: true
+    command: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
+
+  - name: Started puppet-agent
+    become: true
+    systemd_service:
+      name: puppet.service
+      state: started
+      enabled: true
+
+# install puppet-agent in all puppet-client
+- hosts: slaves
+  tasks:
+  - name: Install puppet-client
+    become: true
+    dnf:
+      name: puppet-agent
+      state: present
+
+  - name: add puppetserver in config file
+    become: true
+    lineinfile:
+      dest: /etc/hosts
+      line: 192.168.56.20 master.puppet master
+      state: present
+
+  - name: Stoped firewall
+    become: true
+    systemd_service:
+      name: firewalld.service
+      state: stopped
+
+# configure slave1
+- hosts: slave1.puppet
+  tasks:
+  - name: copy configure file 
+    become: true
+    copy:
+      src: /vagrant/files/sl1-puppet.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf 
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: true
+
+  - name: Started puppet-agent
+    become: true
+    systemd_service:
+      name: puppet.service
+      state: started
+      enabled: true
+
+# configure slave1
+- hosts: slave2.puppet
+  tasks:
+  - name: copy configure file 
+    become: true
+    copy:
+      src: /vagrant/files/sl2-puppet.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf 
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: true  
+
+  - name: Started puppet-agent
+    become: true
+    systemd_service:
+      name: puppet.service
+      state: started
+      enabled: true
+
+# configure mineserver agent
+- hosts: mineserver.puppet
+  tasks:
+  - name: copy configure file 
+    become: true
+    copy:
+      src: /vagrant/files/mine-puppet.conf
+      dest: /etc/puppetlabs/puppet/puppet.conf 
+      owner: root
+      group: root
+      mode: '0755'
+      remote_src: true
+
+  - name: Started puppet-agent
+    become: true
+    systemd_service:
+      name: puppet.service
+      state: started
+      enabled: true

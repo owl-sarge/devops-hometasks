@@ -1,0 +1,11 @@
+---
+#tasks file for add-repo
+- name: Import gpg-key
+  rpm_key:
+    state: present
+    key: http://yum.puppet.com/RPM-GPG-KEY-puppet-20250406
+      
+- name: Add repository puppet
+  yum:
+    name: http://yum.puppet.com/puppet-release-el-9.noarch.rpm
+    state: present
