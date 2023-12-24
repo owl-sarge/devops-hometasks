@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+ 
+  config.vm.box = "generic/debian11"
+
+  config.vm.define "nexus.vm" do |nexus|
+    nexus.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "800"
+    end
+  nexus.vm.network "private_network", ip: "192.168.56.31"
+  nexus.vm.network "forwarded_port", guest: 8081, host: 8091
+  nexus.vm.hostname = 'nexus.vm'
+  nexus.vm.provision "shell", inline: <<-SHELL
+    sed -i "s/^PasswordAuthentication no\$/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+    service sshd restart
+  SHELL
+
+  #nexus.vm.synced_folder ".", "/vagrant"
+  end  
+  
+  config.vm.define "staging.vm" do |staging|
+    staging.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "512"
+    end
+  staging.vm.network "private_network", ip: "192.168.56.32"
+  staging.vm.hostname = 'staging.vm'
+
+  staging.vm.provision "shell", inline: <<-SHELL
+    sed -i "s/^PasswordAuthentication no\$/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+    service sshd restart
+  SHELL
+  #staging.vm.synced_folder ".", "/vagrant"
+  end
+
+  config.vm.define "production.vm" do |production|
+    production.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "512"
+    end
+  production.vm.network "private_network", ip: "192.168.56.33"
+  production.vm.hostname = 'production.vm'
+
+  production.vm.provision "shell", inline: <<-SHELL
+    sed -i "s/^PasswordAuthentication no\$/PasswordAuthentication yes/g" /etc/ssh/sshd_config
+    service sshd restart
+  SHELL
+
+  #production.vm.synced_folder ".", "/vagrant"
+  end
+ 
+  config.vm.define "jenkins.vm" do |jenkins|
+    jenkins.vm.provider "virtualbox" do |vb|
+     vb.gui = false
+     vb.memory = "1200"
+    end
+  jenkins.vm.network "private_network", ip: "192.168.56.30"
+  jenkins.vm.hostname = 'jenkins.vm'
+  jenkins.vm.synced_folder ".", "/vagrant"
+  jenkins.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y sshpass
+  SHELL
+
+  jenkins.vm.provision "ansible_local" do |ansible|
+     ansible_become = true
+     ansible.playbook = "playbook.yml"
+     ansible.inventory_path = "inventory"
+     ansible.limit = "all"
+     ansible.galaxy_role_file = "requirements.yml"
+     ansible.galaxy_roles_path = "/etc/ansible/roles"
+     ansible.galaxy_command = "sudo ansible-galaxy install geerlingguy.java --role-file=%{role_file} --roles-path=%{roles_path} --force"
+    end
+  end
+end  
