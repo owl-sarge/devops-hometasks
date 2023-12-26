@@ -15,6 +15,7 @@
     nexus_public_hostname: 'nexus.vm'
     httpd_setup_enable: false
     nexus_upgrade: true
+    nexus_run_provisionning: false
         
     nexus_privileges:
       - name: all-repos-read
@@ -40,6 +41,6 @@
           - Developpers # role ID here
 
   roles:
-    - role: geerlingguy.java
+    - role: java_8
 
-  #  - role: nexus3-oss
+    - role: nexus3-oss
