@@ -3,7 +3,6 @@ jenkins_plugins: >
   credentials-binding
   locale
   git
-  golang
   timestamper
   pipeline-groovy-lib
   workflow-basic-steps
@@ -17,6 +16,7 @@ jenkins_plugins: >
   configuration-as-code
   ssh
   nexus-artifact-uploader
+  docker-plugin
 
 jenkins_admin_password: admin
 jenkins_admin_user: admin

@@ -17,7 +17,7 @@
         </hudson.model.ChoiceParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>NEXUS_URL</name>
-          <defaultValue>192.168.56.65:8081/</defaultValue>
+          <defaultValue>192.168.33.90:8081/</defaultValue>
           <trim>false</trim>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
@@ -74,10 +74,10 @@ gzip -f ./artifacts/word-cloud-generator
       <credentialsId>nx-uploader</credentialsId>
     </sp.sd.nexusartifactuploader.NexusArtifactUploader>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
-      <siteName>vagrant@192.168.56.55:22</siteName>
+      <siteName>vagrant@192.168.33.80:22</siteName>
       <command>sudo service wordcloud stop
 
-curl -X GET &quot;http://192.168.56.65:8081/repository/word-cloud-build/$BRANCH/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz&quot; -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD
+curl -X GET &quot;http://192.168.33.90:8081/repository/word-cloud-build/$BRANCH/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz&quot; -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD
 ls -l /opt/wordcloud
 
 gunzip -f  /opt/wordcloud/word-cloud-generator.gz
@@ -89,22 +89,22 @@ sudo service wordcloud start</command>
       <hideCommand>true</hideCommand>
     </org.jvnet.hudson.plugins.SSHBuilder>
     <hudson.tasks.Shell>
-      <command>res=`curl -s http://192.168.56.55:8888/version | jq -r &apos;.version&apos;`
+      <command>res=`curl -s http://192.168.33.80:8888/version | jq -r &apos;.version&apos;`
 if [ &quot;1.$BUILD_NUMBER&quot; != &quot;$res&quot; ]; then
   exit 99
 fi
 
-res=`curl -s -H &quot;Content-Type: application/json&quot; -d &apos;{&quot;text&quot;:&quot;ths is a really really really important thing this is&quot;}&apos; http://192.168.56.55:8888/api | jq &apos;. | length&apos;`
+res=`curl -s -H &quot;Content-Type: application/json&quot; -d &apos;{&quot;text&quot;:&quot;ths is a really really really important thing this is&quot;}&apos; http://192.168.33.80:8888/api | jq &apos;. | length&apos;`
 if [ &quot;7&quot; != &quot;$res&quot; ]; then
   exit 99
 fi</command>
       <configuredLocalRules/>
     </hudson.tasks.Shell>
     <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.6.1">
-      <siteName>vagrant@192.168.56.60:22</siteName>
+      <siteName>vagrant@192.168.33.85:22</siteName>
       <command>sudo service wordcloud stop
 
-curl -X GET &quot;http://192.168.56.65:8081/repository/word-cloud-build/$BRANCH/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz&quot; -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD
+curl -X GET &quot;http://192.168.33.90:8081/repository/word-cloud-build/$BRANCH/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz&quot; -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD
 ls -l /opt/wordcloud
 
 gunzip -f  /opt/wordcloud/word-cloud-generator.gz
