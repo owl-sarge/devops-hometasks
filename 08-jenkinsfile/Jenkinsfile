@@ -11,7 +11,7 @@ pipeline {
     options {
         timestamps ()
     }
-   stages {
+    stages {
         stage ('Get code') {
            steps {
                 git 'https://github.com/owl-sarge/word-cloud-generator.git'
@@ -99,4 +99,4 @@ pipeline {
             }
         }
     }    
-}
+} 
