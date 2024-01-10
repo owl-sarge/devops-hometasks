@@ -39,7 +39,7 @@ pipeline {
                     groupId: 'pipe',
                     version: '1.$BUILD_NUMBER',
                     repository: 'word-cloud-build',
-                    credentialsId: 'nx-uploader',
+                    credentialsId: 'nexus-creds',
                     artifacts: [
                         [artifactId: 'word-cloud',
                         classifier: '',
@@ -49,24 +49,45 @@ pipeline {
                 )
             }
         }
-        stage ('Install and test app on stagin'){
+        stage ('Install app on stagin'){
             steps{
                 withCredentials([usernamePassword(credentialsId: 'slave_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    withCredentials([usernamePassword(credentialsId: 'nx-uploader', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
                         sh '''  
                                 sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$STAGIN_IP "sudo service wordcloud stop"
                                 sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$STAGIN_IP "curl -X GET http://$NEXUS_IP:8081/repository/word-cloud-build/pipe/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD"
                                 sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$STAGIN_IP "gunzip -f  /opt/wordcloud/word-cloud-generator.gz && chmod +x  /opt/wordcloud/word-cloud-generator && sudo service wordcloud start"
                           '''
                     }          
-                }   
+                }
             }
-
+        }
+        stage ('Testing app'){
+            steps{ 
+                parallel (
+                    test1: {
+                        sh '''
+                            res=`curl -s http://$STAGIN_IP:8888/version | jq -r '.version'`
+                            if [ "1.$BUILD_NUMBER" != "$res" ]; then
+                              exit 99
+                            fi
+                        '''    
+                    },
+                    test2: {
+                        sh '''
+                            res=`curl -s -H "Content-Type: application/json" -d '{"text":"ths is a really really really important thing this is"}' http://$STAGIN_IP:8888/api | jq '. | length'`
+                            if [ "7" != "$res" ]; then
+                              exit 99
+                            fi
+                        '''
+                    }
+                )    
+            }
         }
         stage ('Install on production'){
             steps {
                 withCredentials([usernamePassword(credentialsId: 'slave_creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    withCredentials([usernamePassword(credentialsId: 'nx-uploader', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASSWORD')]) {
                         sh '''  
                                 sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$PRODUCTION_IP "sudo service wordcloud stop"
                                 sshpass -p $PASSWORD ssh -o StrictHostKeyChecking=no $USERNAME@$PRODUCTION_IP "curl -X GET http://$NEXUS_IP:8081/repository/word-cloud-build/pipe/word-cloud/1.$BUILD_NUMBER/word-cloud-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $NEXUS_USER:$NEXUS_PASSWORD"
@@ -78,4 +99,4 @@ pipeline {
             }
         }
     }    
-} 
+}
