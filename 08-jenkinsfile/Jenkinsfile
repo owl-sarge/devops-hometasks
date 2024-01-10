@@ -99,8 +99,4 @@ pipeline {
             }
         }
     }    
-<<<<<<< HEAD
 }
-=======
-} 
->>>>>>> refs/remotes/origin/main
