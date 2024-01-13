@@ -13,3 +13,8 @@ jobs:
       - name: build image
         run: docker build -t wcg -f 07-docker/Dockerfile.multi .
       
+      - name: Archive image
+        uses: actions/upload-artifact@v3
+        with:
+          name: wcg
+          path: docker.io/library/*
