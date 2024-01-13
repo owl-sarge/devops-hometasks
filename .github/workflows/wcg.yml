@@ -17,4 +17,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: wcg
-          path: docker.io/library/wcg
+          path: var/lib/docker/wcg
+
+      - name: Test directory
+        run: var/lib/docker/wcg ls -al
