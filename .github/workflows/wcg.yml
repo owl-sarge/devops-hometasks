@@ -1,15 +1,16 @@
 name: wcg build
-on: push
+on:
+  workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
   
     steps:
-      - name: checkout repo
       - uses: actions/checkout@v4
- #       with:
- #         repository: 'owl-sarge/devops-hometasks'
+      - name: checkout repo
+        with:
+          repository: ''
 
-  #    - name: build image
-  #      run: docker build -t wcg:multi -f Dockerfile.multi .
+      - name: build image
+        run: docker build -t wcg:multi -f Dockerfile.multi .
       
