@@ -8,7 +8,7 @@ jobs:
       - name: checkout repo
       - uses: actions/checkuot@v4
         with:
-          repository: ''
+          repository: 'owl-sarge/devops-hometasks'
 
   #    - name: build image
   #      run: docker build -t wcg:multi -f Dockerfile.multi .
