@@ -1,8 +1,10 @@
 name: wcg build
 on: push
 jobs:
+  build:
   runs-on: ubuntu-latest
-    steps:
-      - name: build image wcg
-      run: docker build -t wcg -f /07-docker/Dockerfile.multi .
+  
+  steps:
+    - name: build docker image wcg
+    run: docker build . -f ./07-docker/Dockerfile.multi --tag wcg
 
