@@ -1,0 +1,6 @@
+FROM jenkins/jenkins:jdk17
+ENV JENKINS_USER admin
+ENV JENKINS_PASS admin
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false
+RUN jenkins-plugin-cli --plugins credentials credentials-binding locale git timestamper pipeline-groovy-lib workflow-basic-steps workflow-cps workflow-multibranch pipeline-build-step pipeline-input-step pipeline-milestone-step pipeline-stage-step pipeline-model-definition configuration-as-code ssh nexus-artifact-uploader docker-plugin
+USER jenkins
