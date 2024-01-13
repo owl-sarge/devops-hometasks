@@ -1,0 +1,9 @@
+name: wcg build
+on: [push, workflow_dispatch]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: build image wcg
+      - run: docker build -t wcg -f /07-docker/Dockerfile.multi .
+
