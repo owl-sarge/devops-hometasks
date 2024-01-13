@@ -2,9 +2,14 @@ name: wcg build
 on: push
 jobs:
   build:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
   
-  steps:
-    - name: build docker image wcg
-    run: docker build . -f ./07-docker/Dockerfile.multi --tag wcg
+    steps:
+      - name: checkout repo
+      - uses: actions/checkuot@v4
+        with:
+          repository: ''
 
+      - name: build image
+        run: docker build -t wcg:multi -f Dockerfile.multi .
+      
