@@ -7,11 +7,9 @@ jobs:
     runs-on: ubuntu-latest
   
     steps:
-      - uses: actions/checkout@v4
       - name: checkout repo
-        with:
-          repository: ${{ github.repository }}
-
+        uses: actions/checkout@v4
+        
       - name: build image
         run: docker build -t wcg:multi -f Dockerfile.multi .
       
