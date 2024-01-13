@@ -1,5 +1,6 @@
 name: wcg build
 on:
+  push:
   workflow_dispatch:
 jobs:
   build:
