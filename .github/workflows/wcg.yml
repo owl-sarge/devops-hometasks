@@ -11,13 +11,14 @@ jobs:
         uses: actions/checkout@v4
         
       - name: build image
-        run: docker build -t wcg -o wcg.tar -f 07-docker/Dockerfile.multi .
-      
-      - name: Archive image
-        uses: actions/upload-artifact@v3
-        with:
-          name: wcg
-          path: var/lib/docker/wcg
+        run: |
+           docker build -t wcg -f 07-docker/Dockerfile.multi .
+           docker save --output /wcg.tar wcg  
+#      - name: Archive image
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: wcg
+#          path: var/lib/docker/wcg
 
       - name: Test directory
-        run: var/lib/docker/wcg ls -al
+        run: /  ls -al
