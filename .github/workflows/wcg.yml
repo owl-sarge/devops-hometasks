@@ -13,7 +13,7 @@ jobs:
       - name: build image
         run: |
            docker build -t wcg -f 07-docker/Dockerfile.multi .
-           docker save --output /tmp/wcg.tar wcg  
+           docker image save --output /tmp/wcg.tar wcg 
 #      - name: Archive image
 #        uses: actions/upload-artifact@v3
 #        with:
