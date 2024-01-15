@@ -12,12 +12,4 @@ jobs:
         
       - name: build image
         run: docker build -t wcg -f 07-docker/Dockerfile.multi .
-      - name: Archive image
-        uses: docker/build-push-action@v2
-        with:
-          push: false
-          builder: ${{ steps.build.outputs.name }}
-          tags: "wcg:latest"
-          load: true
-      - name: Test directory
-        run: /tmp  ls -al
+ 
