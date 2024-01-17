@@ -28,7 +28,7 @@ jobs:
         env:
           image_tag: ${{ github.sha }}
         run: |
-          docker build -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest .
+          docker build -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest -f 07-docker/Dockerfile.multi .
           docker push ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag
           docker push ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest
  
