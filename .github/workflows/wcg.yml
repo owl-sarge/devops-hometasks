@@ -1,15 +1,36 @@
-name: wcg build
+name: CI
+
+env:
+  REGISTRY: "ghcr.io"
+
 on:
   push:
+    branches: [ "main" ]
   workflow_dispatch:
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-  
+    runs-on: self-hosted
     steps:
-      - name: checkout repo
-        uses: actions/checkout@v4
-        
-      - name: build image
-        run: docker build -t wcg -f 07-docker/Dockerfile.multi .
+
+      - uses: actions/checkout@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.ACTION_TOKEN }}
+          
+      - name: downcase REPO
+        run: |
+          echo "REPO=${GITHUB_REPOSITORY_OWNER,,}" >>${GITHUB_ENV}
+          
+      - name: docker build and push
+        env:
+          image_tag: ${{ github.sha }}
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest .
+          docker push ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag
+          docker push ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest
  
