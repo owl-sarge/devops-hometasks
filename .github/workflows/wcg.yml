@@ -1,9 +1,11 @@
-name: CI
+name: Build wcg
 
 env:
   REGISTRY: "ghcr.io"
 
 on:
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
