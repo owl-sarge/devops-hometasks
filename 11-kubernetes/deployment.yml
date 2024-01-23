@@ -13,8 +13,8 @@ spec:
     spec:
       containers:
         - name: wcg
-            image: ghcr.io/owl-sarge/wcg:latest
-            imagePullPolicy: Always
-            ports:
-              - containerPort: 8888
+          image: ghcr.io/owl-sarge/wcg:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8888
 
