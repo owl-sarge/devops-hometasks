@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Values.container.label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.container.label }}
+    spec:
+      containers:
+        - name: {{ .Values.container.name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.teg }}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.container.port }}
+

@@ -1,0 +1,17 @@
+
+service:
+  port: 80
+  name: wcg-service
+
+container: 
+  port: 8888
+  name: wcg
+  label: wcg
+
+image:
+  repository: ghcr.io/owl-sarge/wcg
+  teg: latest
+
+ingress:
+  host: wcg-local.com
+
