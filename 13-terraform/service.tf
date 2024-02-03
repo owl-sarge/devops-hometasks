@@ -1,15 +1,15 @@
 resource "kubernetes_service_v1" "wcg-service" {
   metadata {
-    name = "wcg-tf"
+    name = var.service_name
   }
   spec {
     selector = {
-      app = "wcg"
+      app = var.labels
     }
 
     port {
-      port        = 80
-      target_port = 8888
+      port        = var.service_port
+      target_port = var.container_port
     }
     type = "ClusterIP"
   }

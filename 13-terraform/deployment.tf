@@ -4,7 +4,7 @@ resource "kubernetes_deployment_v1" "wcg-terraform" {
   metadata {
     name = "wcg-terraform"
     labels = {
-      app = "wcg"
+      app = var.labels
     }
   }
 
@@ -12,24 +12,24 @@ resource "kubernetes_deployment_v1" "wcg-terraform" {
 
     selector {
       match_labels = {
-        app = "wcg"
+        app = var.labels
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "wcg"
+          app = var.labels
         }
       }
 
       spec {
         container {
-          image             = "ghcr.io/owl-sarge/wcg:latest"
-          name              = "wcg"
+          image             = var.image
+          name              = var.image_name
           image_pull_policy = "Always"
           port {
-            container_port = 8888
+            container_port = var.container_port
           }
         }
       }

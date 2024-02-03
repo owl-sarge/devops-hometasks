@@ -9,21 +9,21 @@ resource "kubernetes_ingress_v1" "wcg-ingress-tf" {
   spec {
     default_backend {
       service {
-        name = "wcg-tf"
+        name = var.service_name
         port {
-          number = 80
+          number = var.service_port
         }
       }
     }
     rule {
-      host = "wcg-local.com"
+      host = var.host_name
       http {
         path {
           backend {
             service {
-              name = "wcg-tf"
+              name = var.service_name
               port {
-                number = 80
+                number = var.service_port
               }
             }
           }
