@@ -28,6 +28,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
           TAG_CONTEXT: branch
           WITH_V: false
+
+      - name: helm-check
+        uses: igabaydulin/helm-check-action@0.1.4
+        env:
+          CHART_LOCATION: ./12-helm
+          CHART_VALUES: ./12-helm/values.yaml
           
       - name: downcase REPO
         run: |
