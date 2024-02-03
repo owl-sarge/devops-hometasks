@@ -5,6 +5,11 @@ terraform {
       version = "2.25.2"
     }
   }
+
+    backend "kubernetes" {
+    secret_suffix    = "state"
+    config_path      = "~/.kube/config"
+  }
 }
 
 provider "kubernetes" {
