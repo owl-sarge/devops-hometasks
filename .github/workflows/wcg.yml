@@ -46,7 +46,7 @@ jobs:
           
       - name: docker build and push
         env:
-          image_tag: ${{ github.sha }}
+          image_tag: ${{ steps.tag_version.outputs.new_tag }}
         run: |
           docker build -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag -t ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:latest -f 07-docker/Dockerfile.multi .
           docker push ${{ env.REGISTRY }}/${{ env.REPO }}/wcg:$image_tag
