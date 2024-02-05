@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.container.name }}
-          image: {{ .Values.image.repository }}:{{ .Values.image.teg }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.teg | default .Chart.AppVersion }}
           imagePullPolicy: Always
           ports:
             - containerPort: {{ .Values.container.port }}

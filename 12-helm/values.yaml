@@ -10,7 +10,7 @@ container:
 
 image:
   repository: ghcr.io/owl-sarge/wcg
-  teg: latest
+  teg: ""
 
 ingress:
   host: wcg-local.com
