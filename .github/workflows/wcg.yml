@@ -41,7 +41,7 @@ jobs:
           CHART_VALUES: ./12-helm/values.yaml
 
       - name: Package helm-chart
-        run: helm package /12-helm --version ${{ steps.tag_version.outputs.new_tag }} --app-version ${{ steps.tag_version.outputs.new_tag }} -d charts
+        run: helm package 12-helm/ --version ${{ steps.tag_version.outputs.new_tag }} --app-version ${{ steps.tag_version.outputs.new_tag }} -d charts
 
       - name: Chart index
         run: helm repo index .
