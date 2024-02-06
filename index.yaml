@@ -3,12 +3,12 @@ entries:
   wcg-helm:
   - apiVersion: v2
     appVersion: 0.0.1
-    created: "2024-02-06T16:57:59.835524596+03:00"
+    created: "2024-02-06T17:29:20.101634318+03:00"
     description: HW12 Chart
     digest: ff2bf2c3d50a40e7dab5477ab3a58585d458eaf35b939d912ef399a8f3b4fa1a
     name: wcg-helm
     type: application
     urls:
-    - charts/wcg-helm-0.0.1.tgz
+    - https://owl-sarge.github.io/devops-hometasks/charts/wcg-helm-0.0.1.tgz
     version: 0.0.1
-generated: "2024-02-06T16:57:59.835087177+03:00"
+generated: "2024-02-06T17:29:20.101261642+03:00"
