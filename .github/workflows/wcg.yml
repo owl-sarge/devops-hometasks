@@ -20,7 +20,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ github.token }}
+          password: ${{ secrets.ACTION_TOKEN }}
           
       - name: Bump version and push tag
         id: tag_version
