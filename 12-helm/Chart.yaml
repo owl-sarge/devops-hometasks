@@ -1,6 +1,6 @@
 apiVersion: v2
 name: wcg-helm
-version: v0.0.1
-appVersion: v0.0.1
+version: 0.0.1
+appVersion: ""
 description: HW12 Chart
 type: application
