@@ -3,6 +3,7 @@ jenkins_plugins: >
   credentials-binding
   locale
   git
+  golang
   timestamper
   pipeline-groovy-lib
   workflow-basic-steps

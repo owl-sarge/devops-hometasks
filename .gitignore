@@ -1,3 +1,5 @@
 .vagrant/
 .vscode/
 .terraform/
+.terraform.lock.htl
+.terraform.tfstate
