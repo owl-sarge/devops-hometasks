@@ -1,0 +1,11 @@
+---
+- name: GPG key signature
+  ansible.builtin.rpm_key:
+    state: present
+    key: 'http://yum.puppet.com/RPM-GPG-KEY-puppet-20250406'
+  become: true
+- name: Install repo puppet
+  become: true
+  ansible.builtin.yum:
+    name: 'http://yum.puppet.com/puppet-release-el-9.noarch.rpm'
+    state: present

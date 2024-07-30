@@ -1,0 +1,131 @@
+---
+- hosts: all
+  roles:
+    - puppet-repo
+    - firewall
+
+- name: Configure puppetserver
+  hosts: master.puppet
+  become: true
+  tasks:
+   - name: Install software
+     ansible.builtin.yum:
+       name:
+        - puppetserver
+        - git
+       state: present
+
+   - name: Configure size memory
+     ansible.builtin.lineinfile:
+       path: /etc/sysconfig/puppetserver
+       regexp: '^JAVA_ARGS="-Xms2g -Xmx2g -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"'
+       line: JAVA_ARGS="-Xms256m -Xmx256m -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"
+
+   - name: Reconfigure puppetserver
+     ansible.builtin.copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+     with_items:
+        - {src: '/vagrant/files/puppet.conf', dest: '/etc/puppetlabs/puppet/puppet.conf'}
+        - {src: '/vagrant/files/autosign.conf', dest: '/etc/puppetlabs/puppet/autosign.conf'}
+
+   - name: Start puppet-server
+     service:
+       name: puppetserver
+       state: started
+       enabled: true
+
+   - name: Install r10k
+     command: "{{ item }}"
+     with_items:
+      - /opt/puppetlabs/puppet/bin/gem install faraday-net_http -v 3.0.2
+      - /opt/puppetlabs/puppet/bin/gem install faraday -v 2.8.1
+      - /opt/puppetlabs/puppet/bin/gem install r10k
+
+   - name: Create directory r10k
+     ansible.builtin.file:
+       path: /etc/puppetlabs/r10k
+       state: directory  
+
+   - name: Copy configure file
+     ansible.builtin.copy:
+       src: /vagrant/files/r10k.yaml
+       dest: /etc/puppetlabs/r10k/r10k.yaml
+
+   - name: Start r10k
+     ansible.builtin.command: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
+     become: true
+
+   - name: r10k deploy environment
+     ansible.builtin.cron:
+       name: "r10k deploy"
+#       minute: "*"
+       user: root
+       job: /opt/puppetlabs/puppet/bin/r10k deploy environment -p  
+
+   - name: Start puppet-agent
+     become: true
+     service:
+       name: puppet
+       state: started
+       enabled: true
+
+- name: Configure slaves
+  hosts: slaves
+  become: true
+  tasks:
+   - name: Install puppet-agent
+     ansible.builtin.yum:
+       name: puppet-agent
+       state: present
+     become: true
+
+   - name: Configure hosts
+     ansible.builtin.lineinfile:
+       path: /etc/hosts
+       line: 192.168.60.30 master.puppet
+     become: true
+
+- name: Configure slave1
+  hosts: slave1.puppet
+  become: true
+  tasks:
+   - name: Config puppet agent
+     ini_file:
+      path: /etc/puppetlabs/puppet/puppet.conf
+      section: agent
+      option: "{{ item.option }}"
+      value: "{{ item.value }}"
+     with_items:
+      - {  option: "server", value: "master.puppet" }
+      - {  option: "runinterval", value: "30s" }
+      - {  option: "environment", value: "static"}
+
+   - name: Start puppet-agent
+     become: true
+     service:
+       name: puppet
+       state: started
+       enabled: true
+
+- name: Configure slave2
+  hosts: slave2.puppet
+  become: true
+  tasks:
+   - name: Config puppet agent
+     ini_file:
+      path: /etc/puppetlabs/puppet/puppet.conf
+      section: agent
+      option: "{{ item.option }}"
+      value: "{{ item.value }}"
+     with_items:
+      - {  option: "server", value: "master.puppet" }
+      - {  option: "runinterval", value: "30s" }
+      - {  option: "environment", value: "dynamic"}
+      
+   - name: Start puppet-agent
+     become: true
+     service:
+       name: puppet
+       state: started
+       enabled: true

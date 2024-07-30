@@ -1,4 +1,3 @@
----
 :cachedir: '/var/cache/r10k'
 
 :sources:

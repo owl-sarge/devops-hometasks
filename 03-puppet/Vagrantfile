@@ -1,70 +1,39 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
 Vagrant.configure("2") do |config|
- 
-config.vm.box = "generic/centos9s"
-    
-  config.vm.define "master.puppet" do |master|
-    master.vm.provider "virtualbox" do |vb|
-      vb.gui = false
-      vb.memory = "800"
-    end
 
-    master.vm.network "private_network", ip: "192.168.56.20"
-    master.vm.hostname = 'master.puppet'
-    master.vm.synced_folder ".", "/vagrant"
-    master.vm.provision "ansible_local" do |ansible|
-      ansible_become = true
-      ansible.playbook = "playbook.yml"
-      ansible.inventory_path = "inventory"
+  config.vm.box = "generic/centos9s"
+  config.vm.box_check_update = false
+  config.vm.synced_folder ".", "/vagrant" # disabled: true
+
+    config.vm.define "slave1.puppet" do |slave1|
+      slave1.vm.network "private_network", ip: "192.168.60.31"
+      slave1.vm.hostname = "slave1.puppet"
+      slave1.vm.provider "virtualbox" do |vb|
+       vb.name = "slave1.puppet"
+       vb.memory = "512"
+      end
+    end   
+    config.vm.define "slave2.puppet" do |slave2|
+      slave2.vm.network "private_network", ip: "192.168.60.32"
+      slave2.vm.hostname = "slave2.puppet"
+      slave2.vm.provider "virtualbox" do |vb|
+       vb.name = "slave2.puppet"
+       vb.memory = "512"
+      end
     end
-  
+    config.vm.define "master.puppet" do |master|
+      master.vm.network "private_network", ip: "192.168.60.30"
+      master.vm.hostname = "master.puppet"
+      master.vm.provision "file", source: ".vagrant/machines/slave1.puppet/virtualbox/private_key", destination: "/home/vagrant/.ssh/private_key_slave1"
+      master.vm.provision "file", source: ".vagrant/machines/slave2.puppet/virtualbox/private_key", destination: "/home/vagrant/.ssh/private_key_slave2"
+      master.vm.provider "virtualbox" do |vb|
+       vb.name = "master.puppet"
+       vb.memory = "1024"
+      end  
+      master.vm.provision "ansible_local" do |ansible|
+        ansible.playbook = "playbook.yaml"
+        ansible.limit = 'all'
+        ansible.inventory_path = "inventory"
+
+      end
+    end
   end
-
-  config.vm.define "slave1.puppet" do |slave1|
-    slave1.vm.provider "virtualbox" do |vb|
-      vb.gui = false
-      vb.memory = "512"
-    end
-
-    slave1.vm.network "private_network", ip: "192.168.56.21"
-    slave1.vm.hostname = 'slave1.puppet'
-    slave1.vm.synced_folder ".", "/vagrant"  
-    slave1.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
-      ansible.inventory_path = "inventory"
-    end
-  end
-
-  config.vm.define "slave2.puppet" do |slave2|
-    slave2.vm.provider "virtualbox" do |vb|
-      vb.gui = false
-      vb.memory = "512"
-    end
-
-    slave2.vm.network "private_network", ip: "192.168.56.22"
-    slave2.vm.hostname = 'slave2.puppet'
-    slave2.vm.synced_folder ".", "/vagrant"
-    slave2.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
-      ansible.inventory_path = "inventory"
-    end
-  end 
-
-  config.vm.define "mineserver.puppet" do |mineserver|
-    mineserver.vm.provider "virtualbox" do |vb|
-      vb.gui = false
-      vb.memory = "512"
-    end
-
-    mineserver.vm.network "private_network", ip: "192.168.56.23"
-    mineserver.vm.hostname = 'mineserver.puppet'
-    mineserver.vm.synced_folder ".", "/vagrant"
-    mineserver.vm.provision "ansible" do |ansible|
-      ansible.playbook = "playbook.yml"
-      ansible.inventory_path = "inventory"
-    end
-  end 
-
-end
